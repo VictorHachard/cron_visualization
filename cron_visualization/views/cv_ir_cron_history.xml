@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="cv_ir_cron_history_view_tree" model="ir.ui.view">
+            <field name="name">cv.ir.cron.history.view.tree</field>
+            <field name="model">cv.ir.cron.history</field>
+            <field name="arch" type="xml">
+                <tree create="0" delete="0">
+                    <field name="display_name" string="Name"/>
+                    <field name="state" widget="badge" decoration-success="state == 'success'" decoration-danger="state == 'fail'"/>
+                    <field name="duration" widget="float_time"/>
+                    <field name="user_id" widget="many2one_avatar"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="cv_ir_cron_history_action" model="ir.actions.act_window">
+            <field name="name">History</field>
+            <field name="res_model">cv.ir.cron.history</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_empty_folder">No history found!</p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

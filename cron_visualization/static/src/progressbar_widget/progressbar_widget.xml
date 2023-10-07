@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- These widget templates are intended for read-only mode only -->
+
+    <t t-name="progressbar_widget" owl="1">
+        <span>
+            <div class="progress">
+                <div t-attf-class="progress-bar progress-bar-striped {{ isAnimated ? 'progress-bar-animated' : '' }} {{ state.currentValue == state.maxValue ? 'bg-success' : '' }}" role="progressbar" t-att-aria-valuenow="state.currentValue" t-att-aria-valuemin="0" t-att-aria-valuemax="state.maxValue" t-att-style="'width: min(' + 100 * state.currentValue / state.maxValue + '%, 100%)'">
+                    <t t-out="state.currentValue + '%'"/>
+                </div>
+            </div>
+        </span>
+    </t>
+
+
+<!--            <div class="o_progressbar w-100 d-flex align-items-center" t-ref="numpadDecimal">-->
+<!--            <div t-if="props.title" class="o_progressbar_title text-nowrap pe-1"><t t-esc="props.title"/></div>-->
+<!--            <div class="o_progress align-middle overflow-hidden" aria-valuemin="0" t-att-aria-valuemax="state.maxValue" t-att-aria-valuenow="state.currentValue">-->
+<!--                <div t-attf-class="{{ state.currentValue > state.maxValue ? 'bg-secondary' : 'bg-primary' }} h-100" t-att-style="'width: min(' + 100 * state.currentValue / state.maxValue + '%, 100%)'"></div>-->
+<!--            </div>-->
+<!--            <div class="o_progressbar_value d-flex">-->
+<!--                <t t-if="isPercentage">-->
+<!--                    <input-->
+<!--                        t-if="isEditable and props.isCurrentValueEditable"-->
+<!--                        t-ref="currentValue"-->
+<!--                        class="o_input h-100 text-center"-->
+<!--                        type="text"-->
+<!--                        inputmode="decimal"-->
+<!--                        t-att-value="formatCurrentValue() or ''"-->
+<!--                        t-att-required="props.required"-->
+<!--                        t-on-change="onCurrentValueChange"-->
+<!--                        t-on-input="onCurrentValueInput"-->
+<!--                        t-on-focus="onInputFocus"-->
+<!--                        t-on-blur="onInputBlur"-->
+<!--                    />-->
+<!--                    <span t-else="" class="mx-1" t-esc="formatCurrentValue(true)"/>-->
+<!--                    <span>%</span>-->
+<!--                </t>-->
+<!--                <t t-else="">-->
+<!--                    <input-->
+<!--                        t-if="isEditable and props.isCurrentValueEditable"-->
+<!--                        t-ref="currentValue"-->
+<!--                        class="o_input h-100 text-center"-->
+<!--                        type="text"-->
+<!--                        inputmode="decimal"-->
+<!--                        t-att-value="formatCurrentValue()"-->
+<!--                        t-on-change="onCurrentValueChange"-->
+<!--                        t-on-input="onCurrentValueInput"-->
+<!--                        t-on-focus="onInputFocus"-->
+<!--                        t-on-blur="onInputBlur"-->
+<!--                    />-->
+<!--                    <span t-else="" class="mx-1" t-esc="formatCurrentValue(true)"/>-->
+<!--                    /-->
+<!--                    <input-->
+<!--                        t-if="isEditable and props.isMaxValueEditable"-->
+<!--                        t-ref="maxValue"-->
+<!--                        class="o_input h-100 text-center"-->
+<!--                        type="text"-->
+<!--                        inputmode="decimal"-->
+<!--                        t-att-value="formatMaxValue()"-->
+<!--                        t-on-change="onMaxValueChange"-->
+<!--                        t-on-input="onMaxValueInput"-->
+<!--                        t-on-focus="onInputFocus"-->
+<!--                        t-on-blur="onInputBlur"-->
+<!--                    />-->
+<!--                    <span t-else="" class="mx-1" t-esc="formatMaxValue(true)"/>-->
+<!--                </t>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--		</t>-->
+<!--	</t>-->
+
+</templates>
