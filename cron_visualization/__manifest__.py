@@ -2,7 +2,7 @@
 {
     'name': "Cron Visualization",
     'summary': "Enhances the cron view.",
-    'description': "",
+    'description': """Cron Visualization is a module that allows you to visualize the cron jobs that are running in your Odoo instance.""",
     'category': 'Technical',
     'version': '0.0.1',
     'author': "Victor",

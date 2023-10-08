@@ -12,8 +12,8 @@ class IrCron(models.Model):
 
     # ir_cron_info_id = fields.One2many('ir.cron.info', 'ir_cron_id', string='Cron Info', readonly=True)
     is_running = fields.Boolean(string='Is Running', compute='_compute_is_running', help='Is the cron currently running')
-    progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration)')
-    history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (success;duration)')
+    progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration;type)')
+    history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (state;duration)')
 
     check_history_integrity = fields.Boolean(string='Check History Integrity', compute='_compute_check_history_integrity', help='Check if the cron is still running (in case of a server restart) using the lock on cron.')
 
@@ -64,7 +64,7 @@ class IrCron(models.Model):
                 cron.progress_estimated = False
                 continue
             running_sql = """
-                SELECT started_at
+                SELECT started_at, type
                 FROM cv_ir_cron_history
                 WHERE state is NULL AND ir_cron_id = %s
                 ORDER BY started_at;
@@ -80,7 +80,7 @@ class IrCron(models.Model):
                 if average_duration[0] > 0:
                     running_since = (fields.Datetime.now() - history[0]).total_seconds() / 60
                     progress = min(99, round(duration / average_duration[0] * 100, 2))
-                    progress_estimated.append(str(progress) + ';' + str(running_since))
+                    progress_estimated.append(str(progress) + ';' + str(running_since) + ';' + history[1])
             if progress_estimated:
                 cron.progress_estimated = ','.join(progress_estimated)
             else:
@@ -103,7 +103,7 @@ class IrCron(models.Model):
         try:
             return super().method_direct_trigger()
         except Exception as e:
-            # TODO roolbakc ?
+            self.env.cr.rollback()
             history.finish(False, str(e))
             self.env.cr.commit()
             raise e

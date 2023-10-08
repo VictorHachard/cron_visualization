@@ -15,12 +15,12 @@ export class ProgressbarWidgetField extends ProgressBarField {
             let items = this.props.value.split(',');
             for (let index = 0; index < items.length; index++) {
                 let item = items[index];
-                let [progress, duration] = item.split(';');
-                this.progress_bar_data.push({ progress: progress, duration: formatFloatTime(duration), index: index });
+                let [progress, duration, type] = item.split(';');
+                this.progress_bar_data.push({ progress: progress, duration: formatFloatTime(duration), type: type, index: index });
             }
         } else if (this.props.value) {
-            let [progress, duration] = this.props.value.split(';');
-            this.progress_bar_data.push({ progress: progress, duration: formatFloatTime(duration), index: 0 });
+            let [progress, duration, type] = this.props.value.split(';');
+            this.progress_bar_data.push({ progress: progress, duration: formatFloatTime(duration), type: type, index: 0 });
         }
     }
 

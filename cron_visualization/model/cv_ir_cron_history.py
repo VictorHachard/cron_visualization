@@ -45,7 +45,7 @@ class CvIrCronHistory(models.Model):
         # Only check last cron if running for more than 5 minutes.
         # last_cron = self[-1]
         for cron in self:
-            if cron.started_at < fields.Datetime.now() - datetime.timedelta(minutes=5):
+            if cron.started_at < fields.Datetime.now() - datetime.timedelta(minutes=1):
                 try:
                     cron.ir_cron_id._try_lock()
                     cron.state = 'interruption'
@@ -54,3 +54,9 @@ class CvIrCronHistory(models.Model):
 
     def name_get(self):
         return [(cron.id, '{}'.format(cron.ir_cron_id.name)) for cron in self]
+
+    @api.autovacuum
+    def _gc_history(self):
+        # delete history older than 30 days
+        domain = [('create_date', '<', fields.Datetime.now() - datetime.timedelta(days=30))]
+        return self.sudo().search(domain).unlink()
