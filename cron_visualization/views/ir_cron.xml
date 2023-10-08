@@ -33,8 +33,7 @@
                                         <strong class="o_kanban_record_title"><field name="name"/></strong>
                                     </div>
                                     <span>
-                                        <field name="is_running" widget="spinner_widget"/> 
-<!--                                        <field name="progress" widget="progressbar"/>-->
+                                        <field name="is_running" widget="spinner_widget"/>
                                     </span>
                                 </div>
                                 <div class="o_kanban_record_bottom">
@@ -47,21 +46,19 @@
                                         </div>
                                     </div>
                                     <div class="oe_kanban_bottom_right">
-                                        <field name="running_since" widget="float_time"/>
+
                                     </div>
                                 </div>
                                 <div>
                                     <div class="row mt-2">
                                         <div class="col-md-auto">
-                                            <field name="history" widget="cron_history_widget" style="min-width: 160px"/>
+                                            <field name="history" widget="cron_history_widget" style="min-width: 160px" options="{'detail': True}"/>
                                         </div>
                                         <div class="col">
                                             <field name="progress_estimated" widget="progressbar_widget" style="display:block;margin-top: 0.4rem;"/>
                                         </div>
                                     </div>
                                 </div>
-<!--                                <field name="progress_estimated" widget="progressbar_widget" class="mt-2" style="display:block;"/>-->
-<!--                                <field name="history" widget="cron_history_widget"/>-->
                             </div>
                         </t>
                     </templates>

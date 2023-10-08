@@ -2,7 +2,7 @@
 <templates>
     <t t-name="cron_visualization.IrCronDashboard" owl="1">
         <div class="o_ir_cron_dashboard container-fluid py-4 border-bottom bg-white">
-            <p>
+            <p class="mb-0">
                 This view is refreshed every 2.5 seconds.
             </p>
         </div>

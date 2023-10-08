@@ -12,8 +12,7 @@ class IrCron(models.Model):
 
     # ir_cron_info_id = fields.One2many('ir.cron.info', 'ir_cron_id', string='Cron Info', readonly=True)
     is_running = fields.Boolean(string='Is Running', compute='_compute_is_running', help='Is the cron currently running')
-    progress_estimated = fields.Float(string='Progress Estimated', compute='_compute_progress_estimated', help='Estimated progress of the current run based on the history')
-    running_since = fields.Float(string='Running Since', compute='_compute_running_since', help='How long the cron is running')
+    progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration)')
     history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (success;duration)')
 
     check_history_integrity = fields.Boolean(string='Check History Integrity', compute='_compute_check_history_integrity', help='Check if the cron is still running (in case of a server restart) using the lock on cron.')
@@ -39,27 +38,15 @@ class IrCron(models.Model):
         }
 
     def _compute_is_running(self):
-        """ Check last history to know if the cron is running. """
+        """ Check history to know if cron is running. """
         for cron in self:
-            if not cron.cv_ir_cron_history_ids:
-                cron.is_running = False
-                continue
-            cron.is_running = cron.cv_ir_cron_history_ids[-1].ended_at is False and not cron.cv_ir_cron_history_ids[-1].state
-
-    def _compute_running_since(self):
-        """ Check last history to know how long the cron is running. """
-        now = fields.Datetime.now()
-        for cron in self:
-            if not cron.cv_ir_cron_history_ids or not cron.is_running:
-                cron.running_since = False
-                continue
-            cron.running_since = (now - cron.cv_ir_cron_history_ids[-1].started_at).total_seconds() / 60
+            cron.is_running = len(cron.cv_ir_cron_history_ids.filtered(lambda h: not h.state)) > 0
 
     def _compute_progress_estimated(self):
         """ Check history to estimate the progress of the current run. """
         for cron in self:
             if not cron.cv_ir_cron_history_ids or not cron.is_running:
-                cron.progress_estimated = 0
+                cron.progress_estimated = False
                 continue
             avg_sql = """
                 SELECT AVG(duration) AS average_duration
@@ -74,30 +61,30 @@ class IrCron(models.Model):
             self.env.cr.execute(avg_sql, (cron.id,))
             average_duration = self.env.cr.fetchone()
             if not average_duration:
-                cron.progress_estimated = 0
+                cron.progress_estimated = False
                 continue
-            last_sql = """
+            running_sql = """
                 SELECT started_at
                 FROM cv_ir_cron_history
-                WHERE state is NULL AND id = (
-                    SELECT id
-                    FROM cv_ir_cron_history
-                    WHERE ir_cron_id = %s
-                    ORDER BY id DESC
-                    LIMIT 1
-                );
+                WHERE state is NULL AND ir_cron_id = %s
+                ORDER BY started_at;
             """
-            self.env.cr.execute(last_sql, (cron.id,))
-            started_at = self.env.cr.fetchone()
-            if not started_at:
-                cron.progress_estimated = 0
+            self.env.cr.execute(running_sql, (cron.id,))
+            running_sql = self.env.cr.fetchall()
+            if not running_sql:
+                cron.progress_estimated = False
                 continue
-            duration = (fields.Datetime.now() - started_at[0]).total_seconds() / 60
-            print('average_duration', average_duration[0])
-            if average_duration[0] > 0:
-                cron.progress_estimated = min(99, round(duration / average_duration[0] * 100, 2))
+            progress_estimated = []
+            for history in running_sql:
+                duration = (fields.Datetime.now() - history[0]).total_seconds() / 60
+                if average_duration[0] > 0:
+                    running_since = (fields.Datetime.now() - history[0]).total_seconds() / 60
+                    progress = min(99, round(duration / average_duration[0] * 100, 2))
+                    progress_estimated.append(str(progress) + ';' + str(running_since))
+            if progress_estimated:
+                cron.progress_estimated = ','.join(progress_estimated)
             else:
-                cron.progress_estimated = 0
+                cron.progress_estimated = False
 
     def _compute_history(self):
         for cron in self:
@@ -105,13 +92,13 @@ class IrCron(models.Model):
                 cron.history = ''
                 continue
             res = []
-            for history in cron.cv_ir_cron_history_ids[-10:]:
-                res.append('{};{}'.format(history.state, history.duration))
+            for history in cron.cv_ir_cron_history_ids[:10]:
+                res.insert(0, '{};{}'.format(history.state if history.state else '', history.duration))
             cron.history = ','.join(res)
 
     def method_direct_trigger(self):
         """ Override the method to setup is_running. """
-        history = self.env['cv.ir.cron.history'].create({'ir_cron_id': self.id})
+        history = self.env['cv.ir.cron.history'].create({'ir_cron_id': self.id, 'type': 'manual'})
         self.env.cr.commit()
         try:
             return super().method_direct_trigger()
@@ -126,7 +113,7 @@ class IrCron(models.Model):
     @api.model
     def _callback(self, cron_name, server_action_id, job_id):
         """ Override the method to setup is_running. """
-        history = self.env['cv.ir.cron.history'].create({'ir_cron_id': job_id})
+        history = self.env['cv.ir.cron.history'].create({'ir_cron_id': job_id, 'type': 'automatic'})
         self.env.cr.commit()
         super()._callback(cron_name, server_action_id, job_id)
         if history.ended_at is False:
@@ -135,5 +122,7 @@ class IrCron(models.Model):
     @api.model
     def _handle_callback_exception(self, cron_name, server_action_id, job_id, job_exception):
         super()._handle_callback_exception(cron_name, server_action_id, job_id, job_exception)
-        history = self.env['cv.ir.cron.history'].search([('ir_cron_id', '=', job_id)], limit=1, order='id DESC')
+        history = self.env['cv.ir.cron.history'].search([
+            ('ir_cron_id', '=', job_id), ('user_id', '=', self.env.user.id), ('type', '=', 'automatic')
+        ], limit=1, order='id DESC')
         history.finish(False, str(job_exception))

@@ -11,6 +11,7 @@
                         <span class="cv_history_dot bg-success me-2" t-if="history['state'] === 'success'" t-att-data-tooltip="history['duration']"></span>
                         <span class="cv_history_dot bg-danger me-2" t-if="history['state'] === 'fail'" t-att-data-tooltip="history['duration']"></span>
                         <span class="cv_history_dot bg-warning me-2" t-if="history['state'] === 'interruption'"></span>
+                        <span class="cv_history_dot bg-primary me-2" t-if="history['state'] === ''"></span>
                     </div>
                 </t>
             </div>
