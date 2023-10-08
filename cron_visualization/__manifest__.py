@@ -11,7 +11,6 @@
     'currency': 'EUR',
     'depends': ['base'],
     'data': [
-        # 'security/res_groups.xml',
         'security/ir.model.access.csv',
 
         'views/cv_ir_cron_history.xml',
@@ -19,11 +18,6 @@
     ],
     'assets': {
         'web.assets_backend': [
-            # 'cron_visualization/static/src/ir_cron_kanban_view/*.scss',
-            # 'cron_visualization/static/src/ir_cron_kanban_view/*.xml',
-            # 'cron_visualization/static/src/ir_cron_kanban_view/*.js',
-            # 'cron_visualization/static/src/spinner_widget/*.xml',
-            # 'cron_visualization/static/src/spinner_widget/*.js',
             'cron_visualization/static/src/*/*.scss',
             'cron_visualization/static/src/*/*.xml',
             'cron_visualization/static/src/*/*.js',

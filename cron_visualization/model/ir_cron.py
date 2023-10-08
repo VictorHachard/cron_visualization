@@ -66,7 +66,7 @@ class IrCron(models.Model):
                 FROM (
                     SELECT ir_cron_id, duration
                     FROM cv_ir_cron_history
-                    WHERE state = 'success' AND ir_cron_id = 10
+                    WHERE state = 'success' AND ir_cron_id = %s
                     ORDER BY id DESC
                     LIMIT 10
                 ) AS recent_success_records;
@@ -93,7 +93,11 @@ class IrCron(models.Model):
                 cron.progress_estimated = 0
                 continue
             duration = (fields.Datetime.now() - started_at[0]).total_seconds() / 60
-            cron.progress_estimated = min(99, round(duration / average_duration[0] * 100 * 100, 2))
+            print('average_duration', average_duration[0])
+            if average_duration[0] > 0:
+                cron.progress_estimated = min(99, round(duration / average_duration[0] * 100, 2))
+            else:
+                cron.progress_estimated = 0
 
     def _compute_history(self):
         for cron in self:

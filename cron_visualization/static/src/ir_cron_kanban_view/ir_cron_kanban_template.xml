@@ -12,5 +12,8 @@
         <xpath expr="//div[hasclass('o_kanban_renderer')]" position="attributes">
             <attribute name="class">o_kanban_renderer o_renderer d-flex ir_cron_kanban_style</attribute>
         </xpath>
+        <xpath expr="//div[hasclass('o_kanban_renderer')]" position="before">
+            <IrCronDashboard/>
+        </xpath>
     </t>
 </templates>
