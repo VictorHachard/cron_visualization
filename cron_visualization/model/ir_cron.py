@@ -78,9 +78,10 @@ class IrCron(models.Model):
             for history in running_sql:
                 duration = (fields.Datetime.now() - history[0]).total_seconds() / 60
                 if average_duration[0] > 0:
-                    running_since = (fields.Datetime.now() - history[0]).total_seconds() / 60
                     progress = min(99, round(duration / average_duration[0] * 100, 2))
-                    progress_estimated.append(str(progress) + ';' + str(running_since) + ';' + history[1])
+                    progress_estimated.append(str(progress) + ';' + str(duration) + ';' + history[1])
+                else:
+                    progress_estimated.append('99;' + str(duration) + ';' + history[1])
             if progress_estimated:
                 cron.progress_estimated = ','.join(progress_estimated)
             else:
