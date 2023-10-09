@@ -29,4 +29,4 @@ export class CronProgressbarWidgetField extends ProgressBarField {
     }
 }
 
-registry.category("fields").add("cron_progressbar_widget", ProgressbarWidgetField);
+registry.category("fields").add("cron_progressbar_widget", CronProgressbarWidgetField);

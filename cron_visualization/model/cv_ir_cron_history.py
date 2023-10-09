@@ -14,14 +14,16 @@ class CvIrCronHistory(models.Model):
     ir_cron_id = fields.Many2one('ir.cron', string='Cron', required=True, ondelete='cascade')
     user_id = fields.Many2one('res.users', string='User', default=lambda self: self.env.user, readonly=True)
     type = fields.Selection([('manual', 'Manual'), ('automatic', 'Automatic')], string='Type', readonly=True)
-    state = fields.Selection([('success', 'Success'), ('fail', 'Failed'), ('interruption', 'Interruption')],
-                             string='State', readonly=True, help="""Success: The cron finished successfully.
+    state = fields.Selection([('success', 'Success'), ('fail', 'Failed'), ('interruption', 'Interruption'), ('running', 'Running')],
+                             string='State', readonly=True, default='running',
+                             help="""Success: The cron finished successfully.
     Failed: The cron finished with an error.
-    Interruption: The cron was interrupted (server restart, ...).""")
+    Interruption: The cron was interrupted (server restart, ...).
+    Running: The cron is currently running.""")
 
     started_at = fields.Datetime(string='Started At', readonly=True, default=fields.Datetime.now)
     ended_at = fields.Datetime(string='Ended At', readonly=True)
-    duration = fields.Float(string='Duration', readonly=True)
+    duration = fields.Float(string='Duration', readonly=True, group_operator="avg")
 
     error = fields.Text(string='Error', readonly=True, help='Error message if the cron failed.')
 
