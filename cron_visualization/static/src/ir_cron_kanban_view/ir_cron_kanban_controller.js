@@ -1,7 +1,6 @@
 /** @odoo-module */
 
 import { KanbanController } from "@web/views/kanban/kanban_controller";
-import rpc from 'web.rpc';
 
 import { onWillStart, onWillDestroy } from "@odoo/owl";
 

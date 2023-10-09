@@ -1,6 +1,6 @@
 /** @odoo-module */
 
-const { Component, onWillStart } = owl;
+const { Component } = owl;
 
 export class IrCronDashboard extends Component {
     setup() {
