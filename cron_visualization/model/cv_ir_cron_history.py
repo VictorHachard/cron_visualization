@@ -40,12 +40,6 @@ class CvIrCronHistory(models.Model):
 
     def check_integrity(self):
         # Check if cron are still running (in case of a server restart) using the lock on cron.
-        # All cron expect the last one are considered as interrupted.
-        # history = self.filtered(lambda h: not h.state).sorted(lambda cron: cron.started_at)
-        # all_expect_last = self.filtered(lambda cron: cron.ir_cron_id.id != self[-1].ir_cron_id.id)
-        # all_expect_last.write({'state': 'interruption'})
-        # Only check last cron if running for more than 5 minutes.
-        # last_cron = self[-1]
         for cron in self:
             if cron.started_at < fields.Datetime.now() - datetime.timedelta(minutes=1):
                 try:
