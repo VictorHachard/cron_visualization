@@ -11,12 +11,24 @@
                     <field name="display_name" string="Name"/>
                     <field name="started_at"/>
                     <field name="ended_at"/>
-                    <field name="duration" widget="float_time"/>
-                    <field name="state" widget="badge" decoration-warning="state == 'interruption'"
-                           decoration-success="state == 'success'" decoration-danger="state == 'fail'"/>
+                    <field name="duration" widget="float_time" avg="Average"/>
                     <field name="user_id" widget="many2one_avatar"/>
                     <field name="error"/>
+                    <field name="state" widget="badge"
+                           decoration-warning="state == 'interruption'" decoration-primary="state == 'running'"
+                           decoration-success="state == 'success'" decoration-danger="state == 'fail'"/>
                 </tree>
+            </field>
+        </record>
+
+        <record id="cv_ir_cron_history_view_graph" model="ir.ui.view">
+            <field name="name">cv.ir.cron.history.view.graph</field>
+            <field name="model">cv.ir.cron.history</field>
+            <field name="arch" type="xml">
+                <graph type="line">
+                    <field name="started_at" interval="day"/>
+                    <field name="duration" string="Average Duration (minutes)" type="measure"/>
+                </graph>
             </field>
         </record>
 
@@ -34,6 +46,8 @@
                     <filter string="Automatic" name="type_automatic" domain="[('type', '=', 'automatic')]"/>
                     <filter string="Manual" name="type_manual" domain="[('type', '=', 'manual')]"/>
                     <group expand="0" string="Group By" colspan="16">
+                        <filter string="Date" name="date_day" context="{'group_by': 'started_at:day'}"/>
+                        <separator/>
                         <filter string="State" name="state" context="{'group_by': 'state'}"/>
                         <filter string="Type" name="type" context="{'group_by': 'type'}"/>
                         <filter string="User" name="user" context="{'group_by': 'user_id'}"/>
@@ -43,9 +57,14 @@
         </record>
 
         <record id="cv_ir_cron_history_action" model="ir.actions.act_window">
+            <!-- Keep in sync with the open_history in ir_cron. -->
             <field name="name">History</field>
             <field name="res_model">cv.ir.cron.history</field>
             <field name="view_mode">tree</field>
+            <field name="view_mode">tree,graph</field>
+            <field name="context">{
+                'graph_groupbys': ['started_at:day', 'state'],
+            }</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_empty_folder">No history found!</p>
             </field>

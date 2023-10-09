@@ -28,7 +28,7 @@ class IrCron(models.Model):
 
     def _compute_check_history_integrity(self):
         for cron in self:
-            history = cron.cv_ir_cron_history_ids.filtered(lambda h: not h.state)
+            history = cron.cv_ir_cron_history_ids.filtered(lambda h: h.state == 'running')
             if history:
                 history.check_integrity()
             cron.check_history_integrity = True
@@ -38,18 +38,21 @@ class IrCron(models.Model):
             cron.cv_history_count = len(cron.cv_ir_cron_history_ids)
 
     def open_history(self):
+        """ Keep in sync with cv_ir_cron_history_action. """
         return {
             'type': 'ir.actions.act_window',
             'name': _('Cron History'),
             'res_model': 'cv.ir.cron.history',
-            'view_mode': 'tree',
+            'view_mode': 'tree,graph',
             'domain': [('ir_cron_id', '=', self.id)],
+            'context': {'graph_groupbys': ['started_at:day', 'state']},
+            'help': _('<p class="o_view_nocontent_empty_folder">No history found!</p>'),
         }
 
     def _compute_is_running(self):
         """ Check history to know if cron is running. """
         for cron in self:
-            cron.is_running = len(cron.cv_ir_cron_history_ids.filtered(lambda h: not h.state)) > 0
+            cron.is_running = len(cron.cv_ir_cron_history_ids.filtered(lambda h: h.state == 'running')) > 0
 
     def _compute_progress_estimated(self):
         """ Check history to estimate the progress of the current run. """
@@ -75,7 +78,7 @@ class IrCron(models.Model):
             running_sql = """
                 SELECT started_at, type
                 FROM cv_ir_cron_history
-                WHERE state is NULL AND ir_cron_id = %s
+                WHERE state = 'running' AND ir_cron_id = %s
                 ORDER BY started_at;
             """
             self.env.cr.execute(running_sql, (cron.id,))
@@ -126,7 +129,7 @@ class IrCron(models.Model):
             #             h.type as htype,
             #             (EXTRACT(EPOCH FROM (NOW() - h.started_at)) / 60) AS running_since
             #         FROM cv_ir_cron_history AS h
-            #         WHERE h.state IS NULL AND h.ir_cron_id = %s
+            #         WHERE h.state = 'running' AND h.ir_cron_id = %s
             #     ) AS cich
             #     join avgerage on 1 = 1;
             # """
@@ -142,7 +145,7 @@ class IrCron(models.Model):
                 continue
             res = []
             for history in cron.cv_ir_cron_history_ids[:10]:
-                res.insert(0, '{};{}'.format(history.state if history.state else '', history.duration))
+                res.insert(0, '{};{}'.format(history.state, history.duration))
             cron.history = ','.join(res)
 
     def method_direct_trigger(self):
