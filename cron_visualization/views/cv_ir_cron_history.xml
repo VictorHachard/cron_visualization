@@ -20,6 +20,28 @@
             </field>
         </record>
 
+        <record id="cv_ir_cron_history_view_search" model="ir.ui.view">
+            <field name="name">cv.ir.cron.history.view.search</field>
+            <field name="model">cv.ir.cron.history</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="display_name"/>
+                    <separator/>
+                    <filter string="Success" name="state_success" domain="[('state', '=', 'success')]"/>
+                    <filter string="Fail" name="state_fail" domain="[('state', '=', 'fail')]"/>
+                    <filter string="Interruption" name="state_interruption" domain="[('state', '=', 'interruption')]"/>
+                    <separator/>
+                    <filter string="Automatic" name="type_automatic" domain="[('type', '=', 'automatic')]"/>
+                    <filter string="Manual" name="type_manual" domain="[('type', '=', 'manual')]"/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="State" name="state" context="{'group_by': 'state'}"/>
+                        <filter string="Type" name="type" context="{'group_by': 'type'}"/>
+                        <filter string="User" name="user" context="{'group_by': 'user_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <record id="cv_ir_cron_history_action" model="ir.actions.act_window">
             <field name="name">History</field>
             <field name="res_model">cv.ir.cron.history</field>

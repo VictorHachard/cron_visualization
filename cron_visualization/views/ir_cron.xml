@@ -42,8 +42,6 @@
                                             <span>Next Execution Date: <field name="nextcall"/>
                                                 (<field name="next_execution_timer" widget="float_time" decoration-danger="next_execution_timer &lt; 0"/>)
                                             </span>
-                                        </div>
-                                        <div>
                                             <span>Repeat Every: <field name="interval_number"/> <field name="interval_type"/></span>
                                         </div>
                                     </div>
