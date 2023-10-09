@@ -7,10 +7,9 @@
             <field name="model">ir.cron</field>
             <field name="inherit_id" ref="base.ir_cron_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//div[hasclass('oe_title')]" position="before">
+                <xpath expr="//h1[hasclass('oe_title')]" position="before">
                     <div class="oe_button_box" name="button_box">
-                        <button name="open_history" type="object" class="oe_stat_button" icon="fa-history"
-                            attrs="{'invisible': [('cv_history_count', '=', 0)]}">
+                        <button name="open_history" type="object" class="oe_stat_button" icon="fa-history">
                             <field name="cv_history_count" widget="statinfo" string="History"/>
                         </button>
                     </div>
@@ -57,7 +56,7 @@
                                             <field name="history" widget="cron_history_widget" style="min-width: 160px" options="{'detail': True}"/>
                                         </div>
                                         <div class="col">
-                                            <field name="progress_estimated" widget="progressbar_widget" style="display:block;"/>
+                                            <field name="progress_estimated" widget="cron_progressbar_widget" style="display:block;"/>
                                         </div>
                                     </div>
                                 </div>

@@ -3,7 +3,7 @@
 
     <!-- These widget templates are intended for read-only mode only -->
 
-    <t t-name="progressbar_widget" owl="1">
+    <t t-name="cron_progressbar_widget" owl="1">
         <span>
             <t t-foreach="getProgressBar" t-as="progress" t-key="progress.index">
                 <div class="d-flex align-items-center">

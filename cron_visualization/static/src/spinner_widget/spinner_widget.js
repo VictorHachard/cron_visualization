@@ -13,4 +13,9 @@ export class SpinnerWidgetField extends BooleanField {
     }
 }
 
-registry.category("fields").add("spinner_widget", SpinnerWidgetField);
+export const spinnerWidgetField = {
+    ...BooleanField,
+    component: SpinnerWidgetField,
+}
+
+registry.category("fields").add("spinner_widget", spinnerWidgetField);
