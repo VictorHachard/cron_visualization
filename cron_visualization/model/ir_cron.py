@@ -10,12 +10,21 @@ class IrCron(models.Model):
     cv_ir_cron_history_ids = fields.One2many('cv.ir.cron.history', 'ir_cron_id', string='Cron History')
     cv_history_count = fields.Integer(string='History Count', compute='_compute_history_count')
 
-    # ir_cron_info_id = fields.One2many('ir.cron.info', 'ir_cron_id', string='Cron Info', readonly=True)
+    next_execution_timer = fields.Float(string='Next Execution Timer', compute='_compute_next_execution_timer', help='Time remaining before the next execution')
+
     is_running = fields.Boolean(string='Is Running', compute='_compute_is_running', help='Is the cron currently running')
     progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration;type)')
     history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (state;duration)')
 
     check_history_integrity = fields.Boolean(string='Check History Integrity', compute='_compute_check_history_integrity', help='Check if the cron is still running (in case of a server restart) using the lock on cron.')
+
+    def _compute_next_execution_timer(self):
+        for cron in self:
+            if cron.nextcall:
+                next_execution_timer = (cron.nextcall - fields.Datetime.now()).total_seconds() / 60
+                cron.next_execution_timer = next_execution_timer
+            else:
+                cron.next_execution_timer = False
 
     def _compute_check_history_integrity(self):
         for cron in self:
@@ -86,6 +95,45 @@ class IrCron(models.Model):
                 cron.progress_estimated = ','.join(progress_estimated)
             else:
                 cron.progress_estimated = False
+
+            # sql = """
+            #     with avgerage as (
+            #         SELECT AVG(duration) AS average_duration
+            #         FROM (
+            #             SELECT ir_cron_id, duration
+            #             FROM cv_ir_cron_history
+            #             WHERE state = 'success' AND ir_cron_id = %s
+            #             ORDER BY id DESC
+            #             LIMIT 10
+            #         ) AS recent_success_records
+            #     )
+            #
+            #     SELECT
+            #         COALESCE(
+            #             STRING_AGG(
+            #                 CASE
+            #                     WHEN avgerage.average_duration > 0 THEN LEAST(99, ROUND(CAST(running_since / avgerage.average_duration * 100 AS numeric), 2)) || ';' || running_since || ';' || htype
+            #                     ELSE '99;' || running_since || ';' || htype
+            #                 END,
+            #                 ','
+            #             ),
+            #             NULL
+            #         ) AS progress_estimated
+            #     FROM (
+            #         SELECT
+            #             h.id,
+            #             h.ir_cron_id,
+            #             h.type as htype,
+            #             (EXTRACT(EPOCH FROM (NOW() - h.started_at)) / 60) AS running_since
+            #         FROM cv_ir_cron_history AS h
+            #         WHERE h.state IS NULL AND h.ir_cron_id = %s
+            #     ) AS cich
+            #     join avgerage on 1 = 1;
+            # """
+            # self.env.cr.execute(sql, (cron.id, cron.id))
+            # result = self.env.cr.fetchone()
+            # if result:
+            #     cron.progress_estimated = result[0]
 
     def _compute_history(self):
         for cron in self:

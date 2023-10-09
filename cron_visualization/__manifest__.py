@@ -21,6 +21,7 @@
             'cron_visualization/static/src/*/*.scss',
             'cron_visualization/static/src/*/*.xml',
             'cron_visualization/static/src/*/*.js',
+            'cron_visualization/static/src/backend_style.scss',
         ]
     },
     'installable': True,
