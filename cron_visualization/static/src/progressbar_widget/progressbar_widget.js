@@ -5,8 +5,8 @@ import { formatFloatTime } from "@web/views/fields/formatters";
 import { registry } from "@web/core/registry";
 import { _lt } from "@web/core/l10n/translation";
 
-export class ProgressbarWidgetField extends ProgressBarField {
-    static template = 'progressbar_widget'
+export class CronProgressbarWidgetField extends ProgressBarField {
+    static template = 'cron_progressbar_widget'
 
     setup() {
         super.setup();
@@ -27,10 +27,6 @@ export class ProgressbarWidgetField extends ProgressBarField {
     get getProgressBar() {
         return this.progress_bar_data;
     }
-
-//    get isAnimated() {
-//        return this.props.record.data.hasOwnProperty('is_running') ? this.props.record.data.is_running : false;
-//    }
 }
 
-registry.category("fields").add("progressbar_widget", ProgressbarWidgetField);
+registry.category("fields").add("cron_progressbar_widget", ProgressbarWidgetField);

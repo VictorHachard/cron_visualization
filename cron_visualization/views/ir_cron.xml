@@ -57,7 +57,7 @@
                                             <field name="history" widget="cron_history_widget" style="min-width: 160px" options="{'detail': True}"/>
                                         </div>
                                         <div class="col">
-                                            <field name="progress_estimated" widget="progressbar_widget" style="display:block;"/>
+                                            <field name="progress_estimated" widget="cron_progressbar_widget" style="display:block;"/>
                                         </div>
                                     </div>
                                 </div>
