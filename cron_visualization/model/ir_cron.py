@@ -72,7 +72,7 @@ class IrCron(models.Model):
             """
             self.env.cr.execute(avg_sql, (cron.id,))
             average_duration = self.env.cr.fetchone()
-            if not average_duration:
+            if not average_duration or not average_duration[0]:
                 cron.progress_estimated = False
                 continue
             running_sql = """

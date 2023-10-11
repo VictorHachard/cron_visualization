@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from odoo import fields, models, api
 from odoo.exceptions import UserError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class CvIrCronHistory(models.Model):
@@ -40,10 +44,12 @@ class CvIrCronHistory(models.Model):
 
     def check_integrity(self):
         # Check if cron are still running (in case of a server restart) using the lock on cron.
+        # TODO: Bug when cron is started manually (no lock)
         for cron in self:
-            if cron.started_at < fields.Datetime.now() - datetime.timedelta(minutes=1):
+            if cron.started_at < fields.Datetime.now() - datetime.timedelta(seconds=30):
                 try:
-                    cron.ir_cron_id._try_lock()
+                    cron.ir_cron_id._try_lock(lockfk=True)
+                    _logger.info("Cron Check Integrity: cron {} was interrupted".format(cron.ir_cron_id.name))
                     cron.state = 'interruption'
                 except UserError as e:
                     pass
