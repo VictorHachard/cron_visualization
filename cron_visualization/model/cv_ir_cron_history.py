@@ -20,16 +20,23 @@ class CvIrCronHistory(models.Model):
     type = fields.Selection([('manual', 'Manual'), ('automatic', 'Automatic')], string='Type', readonly=True)
     state = fields.Selection([('success', 'Success'), ('fail', 'Failed'), ('interruption', 'Interruption'), ('running', 'Running')],
                              string='State', readonly=True, default='running',
-                             help="""Success: The cron finished successfully.
-    Failed: The cron finished with an error.
-    Interruption: The cron was interrupted (server restart, ...).
-    Running: The cron is currently running.""")
+                             help="  * Success: The cron finished successfully.\n"
+                                  "  * Failed: The cron finished with an error\n"
+                                  "  * Interruption: The cron was interrupted (server restart, ...).\n"
+                                  "  * Running: The cron is currently running.")
 
     started_at = fields.Datetime(string='Started At', readonly=True, default=fields.Datetime.now)
     ended_at = fields.Datetime(string='Ended At', readonly=True)
     duration = fields.Float(string='Duration', readonly=True, group_operator="avg")
 
     error = fields.Text(string='Error', readonly=True, help='Error message if the cron failed.')
+
+    def _register_hook(self):
+        """ Register a hook to automatically set the state to interruption when the server is restarted. """
+        history = self.env['cv.ir.cron.history'].sudo().search([('state', '=', 'running')])
+        history.write({'state': 'interruption'})
+        if history:
+            _logger.info('Cron History: %s cron(s) interrupted', len(history))
 
     def finish(self, success, error=False):
         self.ensure_one()
@@ -41,18 +48,6 @@ class CvIrCronHistory(models.Model):
         if error:
             update['error'] = error
         self.write(update)
-
-    def check_integrity(self):
-        # Check if cron are still running (in case of a server restart) using the lock on cron.
-        # TODO: Bug when cron is started manually (no lock)
-        for cron in self:
-            if cron.started_at < fields.Datetime.now() - datetime.timedelta(seconds=30):
-                try:
-                    cron.ir_cron_id._try_lock(lockfk=True)
-                    _logger.info("Cron Check Integrity: cron {} was interrupted".format(cron.ir_cron_id.name))
-                    cron.state = 'interruption'
-                except UserError as e:
-                    pass
 
     def name_get(self):
         return [(cron.id, '{}'.format(cron.ir_cron_id.name)) for cron in self]

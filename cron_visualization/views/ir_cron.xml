@@ -23,8 +23,6 @@
             <field name="model">ir.cron</field>
             <field name="arch" type="xml">
                 <kanban js_class="ir_cron_kanban">
-                    <!-- This field is used to trigger the update of the history -->
-                    <field name="check_history_integrity"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="oe_kanban_global_click">

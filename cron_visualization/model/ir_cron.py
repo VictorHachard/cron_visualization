@@ -16,8 +16,6 @@ class IrCron(models.Model):
     progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration;type)')
     history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (state;duration)')
 
-    check_history_integrity = fields.Boolean(string='Check History Integrity', compute='_compute_check_history_integrity', help='Check if the cron is still running (in case of a server restart) using the lock on cron.')
-
     def _compute_next_execution_timer(self):
         for cron in self:
             if cron.nextcall:
@@ -25,13 +23,6 @@ class IrCron(models.Model):
                 cron.next_execution_timer = next_execution_timer
             else:
                 cron.next_execution_timer = False
-
-    def _compute_check_history_integrity(self):
-        for cron in self:
-            history = cron.cv_ir_cron_history_ids.filtered(lambda h: h.state == 'running')
-            if history:
-                history.check_integrity()
-            cron.check_history_integrity = True
 
     def _compute_history_count(self):
         for cron in self:
