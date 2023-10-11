@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import odoo
 from odoo import fields, models, api, _
+from odoo.exceptions import UserError
 
 
 class IrCron(models.Model):
@@ -12,7 +13,7 @@ class IrCron(models.Model):
 
     next_execution_timer = fields.Float(string='Next Execution Timer', compute='_compute_next_execution_timer', help='Time remaining before the next execution')
 
-    is_running = fields.Boolean(string='Is Running', compute='_compute_is_running', help='Is the cron currently running')
+    is_running = fields.Boolean(string='Is Running', compute='_compute_is_running', search='_search_is_running', help='Is the cron currently running')
     progress_estimated = fields.Char(string='Progress Estimated', compute='_compute_progress_estimated', help='Current progress of the cron (progress;duration;type)')
     history = fields.Char(string='History',  compute='_compute_history', help='History of the last 10 runs (state;duration)')
 
@@ -44,6 +45,22 @@ class IrCron(models.Model):
         """ Check history to know if cron is running. """
         for cron in self:
             cron.is_running = len(cron.cv_ir_cron_history_ids.filtered(lambda h: h.state == 'running')) > 0
+
+    def _search_is_running(self, operator, value):
+        """ Check history to know if cron is running. """
+        if operator not in ('=', '!=') or not isinstance(value, bool):
+            raise UserError(_('Operation not supported'))
+        if operator != '=':
+            value = not value
+        self._cr.execute("""
+            SELECT id FROM ir_cron
+            WHERE id IN (
+                SELECT ir_cron_id
+                FROM cv_ir_cron_history
+                WHERE state = 'running'
+            )
+        """)
+        return [('id', 'in' if value else 'not in', [r[0] for r in self._cr.fetchall()])]
 
     def _compute_progress_estimated(self):
         """ Check history to estimate the progress of the current run. """
