@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import datetime
+import logging
 
 from odoo import fields, models, api
-from odoo.exceptions import UserError
+
+
+_logger = logging.getLogger(__name__)
 
 
 class CvIrCronHistory(models.Model):
@@ -16,16 +19,23 @@ class CvIrCronHistory(models.Model):
     type = fields.Selection([('manual', 'Manual'), ('automatic', 'Automatic')], string='Type', readonly=True)
     state = fields.Selection([('success', 'Success'), ('fail', 'Failed'), ('interruption', 'Interruption'), ('running', 'Running')],
                              string='State', readonly=True, default='running',
-                             help="""Success: The cron finished successfully.
-    Failed: The cron finished with an error.
-    Interruption: The cron was interrupted (server restart, ...).
-    Running: The cron is currently running.""")
+                             help="  * Success: The cron finished successfully.\n"
+                                  "  * Failed: The cron finished with an error\n"
+                                  "  * Interruption: The cron was interrupted (server restart, ...).\n"
+                                  "  * Running: The cron is currently running.")
 
     started_at = fields.Datetime(string='Started At', readonly=True, default=fields.Datetime.now)
     ended_at = fields.Datetime(string='Ended At', readonly=True)
     duration = fields.Float(string='Duration', readonly=True, group_operator="avg")
 
     error = fields.Text(string='Error', readonly=True, help='Error message if the cron failed.')
+
+    def _register_hook(self):
+        """ Register a hook to automatically set the state to interruption when the server is restarted. """
+        history = self.env['cv.ir.cron.history'].sudo().search([('state', '=', 'running')])
+        history.write({'state': 'interruption'})
+        if history:
+            _logger.info('Cron History: %s cron(s) interrupted', len(history))
 
     def finish(self, success, error=False):
         self.ensure_one()
@@ -37,22 +47,6 @@ class CvIrCronHistory(models.Model):
         if error:
             update['error'] = error
         self.write(update)
-
-    def check_integrity(self):
-        # Check if cron are still running (in case of a server restart) using the lock on cron.
-        # All cron expect the last one are considered as interrupted.
-        # history = self.filtered(lambda h: not h.state).sorted(lambda cron: cron.started_at)
-        # all_expect_last = self.filtered(lambda cron: cron.ir_cron_id.id != self[-1].ir_cron_id.id)
-        # all_expect_last.write({'state': 'interruption'})
-        # Only check last cron if running for more than 5 minutes.
-        # last_cron = self[-1]
-        for cron in self:
-            if cron.started_at < fields.Datetime.now() - datetime.timedelta(minutes=1):
-                try:
-                    cron.ir_cron_id._try_lock()
-                    cron.state = 'interruption'
-                except UserError as e:
-                    pass
 
     def name_get(self):
         return [(cron.id, '{}'.format(cron.ir_cron_id.name)) for cron in self]

@@ -17,13 +17,23 @@
             </field>
         </record>
 
+        <record id="ir_cron_view_search_inherit" model="ir.ui.view">
+            <field name="name">ir.cron.view.form.inherit</field>
+            <field name="model">ir.cron</field>
+            <field name="inherit_id" ref="base.ir_cron_view_search"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='all']" position="before">
+                    <filter string="Running" name="running" domain="[('is_running', '=', True)]" />
+                    <separator/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="cv_ir_cron_kanban_view" model="ir.ui.view">
             <field name="name">cv.ir.cron.kanban.view</field>
             <field name="model">ir.cron</field>
             <field name="arch" type="xml">
                 <kanban js_class="ir_cron_kanban">
-                    <!-- This field is used to trigger the update of the history -->
-                    <field name="check_history_integrity"/>
                     <templates>
                         <t t-name="kanban-box">
                             <div t-attf-class="oe_kanban_global_click">
@@ -49,7 +59,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="row mt-2">
+                                    <div class="row mt-1">
                                         <div class="col-md-auto">
                                             <field name="history" widget="cron_history_widget" style="min-width: 160px" options="{'detail': True}"/>
                                         </div>
