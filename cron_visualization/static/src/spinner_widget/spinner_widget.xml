@@ -6,10 +6,8 @@
     <t t-name="spinner_widget" owl="1">
         <span>
             <div class="spinner-border spinner-border-sm text-success" role="status" t-att-data-tooltip="getSpinnerTitle" t-if="props.value">
-              <span class="sr-only">Loading...</span>
             </div>
             <div class="spinner-border spinner-border-sm text-warning" style="animation: none;" role="status" t-att-data-tooltip="getSpinnerTitle" t-if="!props.value">
-              <span class="sr-only">Loading...</span>
             </div>
         </span>
     </t>

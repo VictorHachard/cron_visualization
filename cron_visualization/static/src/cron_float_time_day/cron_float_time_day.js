@@ -17,7 +17,8 @@ export class CronFloatTimeDayWidget extends CharField {
         const hours = this.props.value / 60 % 24; // Get the remaining hours
 
         const dayText = days !== 1 ? _lt('days') : _lt('day');
-        const dayPart = days > 0 ? `${days} ${dayText} and ` : '';
+
+        const dayPart = days > 0 ? `${days} ${dayText} ${_lt('and')} ` : '';
 
         const timePart = formatFloatTime(hours, { displaySeconds: true }).replace('-', '');
 
