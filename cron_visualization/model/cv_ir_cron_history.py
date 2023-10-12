@@ -26,7 +26,7 @@ class CvIrCronHistory(models.Model):
 
     started_at = fields.Datetime(string='Started At', readonly=True, default=fields.Datetime.now)
     ended_at = fields.Datetime(string='Ended At', readonly=True)
-    duration = fields.Float(string='Duration', readonly=True, group_operator="avg")
+    duration = fields.Float(string='Duration', readonly=True, group_operator="avg", help='Duration in seconds')
 
     error = fields.Text(string='Error', readonly=True, help='Error message if the cron failed.')
 

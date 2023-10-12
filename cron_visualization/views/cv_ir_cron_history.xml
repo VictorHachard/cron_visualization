@@ -11,7 +11,7 @@
                     <field name="display_name" string="Name"/>
                     <field name="started_at"/>
                     <field name="ended_at"/>
-                    <field name="duration" widget="float_time" avg="Average"/>
+                    <field name="duration" widget="float_time" avg="Average" string="Duration"/>
                     <field name="user_id" widget="many2one_avatar"/>
                     <field name="error"/>
                     <field name="state" widget="badge"
@@ -21,13 +21,56 @@
             </field>
         </record>
 
+<!--        <record id="cv_ir_cron_history_view_kanban" model="ir.ui.view">-->
+<!--            <field name="name">cv.ir.cron.history.view.kanban</field>-->
+<!--            <field name="model">cv.ir.cron.history</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <kanban class="o_kanban_mobile" create="0" group_create="0">-->
+<!--                    <field name="display_name"/>-->
+<!--                    <field name="user_id"/>-->
+<!--                    <field name="started_at"/>-->
+<!--                    <field name="ended_at"/>-->
+<!--                    <field name="state"/>-->
+<!--                    <templates>-->
+<!--                        <t t-name="kanban-box">-->
+<!--                            <div t-attf-class="oe_kanban_global_click">-->
+<!--                                <div class="o_kanban_primary_left">-->
+<!--                                    <div class="o_primary">-->
+<!--                                        <span class="o_text_overflow" t-att-title="record.display_name.value"><t t-esc="record.display_name.value"/></span>-->
+<!--                                        <field name="user_id" widget="many2one_avatar" options='{"size": [13, 13]}'/>-->
+<!--                                        <div t-if="record.ended_at.raw_value or record.started_at.raw_value" class="text-muted o_row">-->
+<!--                                            <field name="started_at"/>-->
+<!--                                            <i t-if="record.ended_at.raw_value and record.started_at.raw_value" class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon" title="Arrow"/>-->
+<!--                                            <field name="ended_at"/>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </t>-->
+<!--                    </templates>-->
+<!--                </kanban>-->
+<!--            </field>-->
+<!--        </record>-->
+
+        <record id="cv_ir_cron_history_view_pivot" model="ir.ui.view">
+            <field name="name">cv.ir.cron.history.view.pivot</field>
+            <field name="model">cv.ir.cron.history</field>
+            <field name="arch" type="xml">
+                <pivot>
+                    <field name="state" type="col"/>
+                    <field name="started_at" interval="day" type="row"/>
+                    <field name="duration" string="Average Duration (seconds)" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
         <record id="cv_ir_cron_history_view_graph" model="ir.ui.view">
             <field name="name">cv.ir.cron.history.view.graph</field>
             <field name="model">cv.ir.cron.history</field>
             <field name="arch" type="xml">
                 <graph type="line">
                     <field name="started_at" interval="day"/>
-                    <field name="duration" string="Average Duration (minutes)" type="measure"/>
+                    <field name="duration" string="Average Duration (seconds)" type="measure"/>
                 </graph>
             </field>
         </record>
@@ -60,7 +103,7 @@
             <!-- Keep in sync with the open_history in ir_cron. -->
             <field name="name">History</field>
             <field name="res_model">cv.ir.cron.history</field>
-            <field name="view_mode">tree,graph</field>
+            <field name="view_mode">tree,pivot,graph</field>
             <field name="context">{
                 'graph_groupbys': ['started_at:day', 'state'],
             }</field>

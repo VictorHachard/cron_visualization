@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-11 20:40+0000\n"
-"PO-Revision-Date: 2023-10-11 20:40+0000\n"
+"POT-Creation-Date: 2023-10-12 16:53+0000\n"
+"PO-Revision-Date: 2023-10-12 16:53+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -51,8 +51,9 @@ msgstr "Moyenne"
 
 #. module: cron_visualization
 #: model_terms:ir.ui.view,arch_db:cron_visualization.cv_ir_cron_history_view_graph
-msgid "Average Duration (minutes)"
-msgstr "Durée moyenne (minutes)"
+#: model_terms:ir.ui.view,arch_db:cron_visualization.cv_ir_cron_history_view_pivot
+msgid "Average Duration (seconds)"
+msgstr "Durée moyenne (secondes)"
 
 #. module: cron_visualization
 #: model:ir.model.fields,field_description:cron_visualization.field_cv_ir_cron_history__create_uid
@@ -95,8 +96,14 @@ msgstr "Nom d'affichage"
 
 #. module: cron_visualization
 #: model:ir.model.fields,field_description:cron_visualization.field_cv_ir_cron_history__duration
+#: model_terms:ir.ui.view,arch_db:cron_visualization.cv_ir_cron_history_view_tree
 msgid "Duration"
 msgstr "Durée"
+
+#. module: cron_visualization
+#: model:ir.model.fields,help:cron_visualization.field_cv_ir_cron_history__duration
+msgid "Duration in seconds"
+msgstr "Durée en secondes"
 
 #. module: cron_visualization
 #: model:ir.model.fields,field_description:cron_visualization.field_cv_ir_cron_history__ended_at
