@@ -34,7 +34,7 @@ class IrCron(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Cron History'),
             'res_model': 'cv.ir.cron.history',
-            'view_mode': 'tree,pivot,graph',
+            'view_mode': 'tree,pivot,graph,calendar,form',
             'domain': [('ir_cron_id', '=', self.id)],
             'context': {'graph_groupbys': ['started_at:day', 'state']},
             'help': _('<p class="o_view_nocontent_empty_folder">No history found!</p>'),
