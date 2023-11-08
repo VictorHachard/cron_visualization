@@ -20,7 +20,7 @@ class CvIrCronHistory(models.Model):
     state = fields.Selection([('success', 'Success'), ('fail', 'Failed'), ('interruption', 'Interruption'), ('running', 'Running')],
                              string='State', readonly=True, default='running',
                              help="  * Success: The cron finished successfully.\n"
-                                  "  * Failed: The cron finished with an error\n"
+                                  "  * Failed: The cron finished with an error.\n"
                                   "  * Interruption: The cron was interrupted (server restart, ...).\n"
                                   "  * Running: The cron is currently running.")
 
